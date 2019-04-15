@@ -1,0 +1,113 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+# always clean up R environment
+rm(list = ls())
+# load all packages here
+library(mdsr)
+library(RCurl)
+library(stringr)
+library(babynames)
+
+```
+## Exercise 15.1
+```{r}
+macbeth_url <- "http://www.gutenberg.org/cache/epub/1129/pg1129.txt"
+Macbeth_raw <- RCurl::getURL(macbeth_url)
+data(Macbeth_raw)
+```
+
+
+```{r}
+macbeth <- strsplit(Macbeth_raw,"\r\n")[[1]]
+speaking_lines <- grep(("^  [A-Z ]*\\."), macbeth, value = TRUE)
+length(speaking_lines)
+head(speaking_lines)
+```
+There are 646
+
+## Section 15.3
+```{r}
+baby = data.frame(babynames)
+boys1 <- 
+  baby %>%
+  filter(sex == "M", grepl("a$|e$|o$|i$|u$", name)) %>%
+  group_by(name) %>%
+  summarise(n = sum(n)) %>%
+  arrange(desc(n)) %>%
+  head(10)
+boys1
+
+```
+```{r}
+baby2 <-
+  baby %>%
+  filter(grepl('joe$|jo$|Joe$|Jo$', name)) %>%
+  group_by(name) %>%
+  summarise(n = sum(n)) %>%
+  arrange(desc(n)) %>%
+  head(10)
+baby2
+
+
+```
+## Section 15.6
+
+
+
+```{r}
+shakespeare_url <- "http://www.gutenberg.org/files/100/100-0.txt"
+shakespeare_raw <- RCurl::getURL(shakespeare_url)
+shakespeare <- strsplit(shakespeare_raw, "\r\n")[[1]]
+```
+```{r}
+complete <- grep("^[A-Z]+[A-Z]\\.|^  [A-Z]+[A-Z]\\.", shakespeare, value = TRUE)
+
+length(complete)
+```
+
+## Section 15.7
+
+
+
+
+
+```{r}
+line_url <- "http://www.gutenberg.org/files/100/100-0.txt"
+line_raw <- RCurl::getURL(shakespeare_url)
+line <- strsplit(shakespeare_raw, "\r\n")[[1]]
+
+
+line_100 <- grep("^[A-Z]+[A-Z]\\.|^  [A-Z]+[A-Z]\\.", line, value = TRUE) 
+char = line%>% str_extract("^[A-Z]+[A-Z]\\.|^  [A-Z]+[A-Z]\\.")
+line1 = matrix(1, nrow = length(char),ncol = 1)
+
+df = data.frame(char, line1)
+sum = aggregate(df$line1,by = list(char),FUN = sum)
+order = sum[order(sum[,2], decreasing = TRUE),]
+names(order) = c("char", "line1")
+top = order[1:100,]
+
+barplot(top$line1,names.arg = top$char)
+
+```
+
+
+
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+plot(cars)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
